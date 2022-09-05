@@ -8,12 +8,11 @@ class Game(ShowBase):
         properties = WindowProperties()
         properties.setSize(2000, 1200)
         self.win.requestProperties(properties)
+        self.set_background_color(0, 0, 0, 1)
+        self.cam.setPos(0, -700, 60)
 
-        # Load the environment model.
-        self.scene = self.loader.loadModel("models/environment")
-
-        # Reparent the model to render.
-        self.scene.reparentTo(self.render)
+        self.floor = self.loader.loadModel("../Models/ground")
+        self.floor.reparentTo(self.render)
 
 game = Game()
 game.run()
