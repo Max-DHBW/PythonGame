@@ -6,8 +6,14 @@ class Game(ShowBase):
         ShowBase.__init__(self)
 
         properties = WindowProperties()
-        properties.setSize(1000, 750)
+        properties.setSize(2000, 1200)
         self.win.requestProperties(properties)
+
+        # Load the environment model.
+        self.scene = self.loader.loadModel("models/environment")
+
+        # Reparent the model to render.
+        self.scene.reparentTo(self.render)
 
 game = Game()
 game.run()
