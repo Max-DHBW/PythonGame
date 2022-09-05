@@ -14,5 +14,8 @@ class Game(ShowBase):
         self.floor = self.loader.loadModel("../Models/ground")
         self.floor.reparentTo(self.render)
 
+        #Koordinaten Eckpunkte
+        #print(self.floor.getTightBounds())
+
 game = Game()
 game.run()
