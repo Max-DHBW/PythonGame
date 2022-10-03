@@ -1,14 +1,35 @@
-from direct.showbase.ShowBase import ShowBase
+import math
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3, Vec2
 import random as rand
 
+class Grass():
+    def __init__(self, pos):
+        self.grass = Actor("../Models/grass", {})
+        self.grass.reparentTo(render)
+        self.grass.setPos(pos)
+
+        self.was_eaten = False
+
+    def return_pos(self):
+        return self.grass.getPos()
+
+    def delete(self):
+        if self.grass is not None:
+            self.grass.cleanup()
+            self.grass.removeNode()
+            self.grass = None
+
 class Rabbit():
-    def __init__(self, pos, speed):
+    def __init__(self, pos, speed, health):
         self.rabbit = Actor("../Models/rabbit", {})
         self.rabbit.reparentTo(render)
         self.rabbit.setPos(pos)
+
         self.speed = speed
+        self.health = health
+        self.max_health = health
+        self.visibility_range = 50
 
         # Initialisirung
         self.direction = Vec3(0, 0, 0)
@@ -17,8 +38,51 @@ class Rabbit():
         self.random_direction(self.direction_next_direction)
 
 
-    def update(self):
-        self.rabbit.setPos(self.move())
+    def update(self, food_sources):
+
+        distance_min = 10000
+        index = -1
+
+        for i in range(len(food_sources)):
+            pos_rabbit = self.rabbit.getPos()
+            pos_grass = food_sources[i].return_pos()
+            connection_vektor = pos_grass - pos_rabbit
+            distance = math.sqrt(connection_vektor.getX()**2 + connection_vektor.getY()**2)
+
+            if distance < distance_min:
+                if not food_sources[i].was_eaten:
+                    index = i
+                    distance_min = distance
+
+        # Rabbit sieht kein Grass wegen der Sichtweite
+        if distance_min > 20 or index < 0:
+            self.rabbit.setPos(self.move())
+            self.health = self.health - 1
+            return
+
+        # Rabbit steht auf dem Grass und isst das Grass
+        if distance_min == 0:
+            self.health = self.max_health
+            food_sources[index].was_eaten = True
+        # Rabbit steht nicht auf dem Grass, sieht das Grass aber
+        else:
+            self.health = self.health - 1
+            # Distanz ist kleiner als der Schritt, führt dazu, dass Rabbit auf die Position vom Grass geht
+            if distance_min <= self.speed:
+                self.rabbit.setPos(food_sources[index].return_pos())
+            # Rabbit läuft in die Richtung des Grasses
+            else:
+                pos_rabbit = self.rabbit.getPos()
+                pos_grass = food_sources[index].return_pos()
+
+                vektor = pos_grass - pos_rabbit
+                norm_fac = self.speed / distance_min
+
+                x = vektor.getX() * norm_fac
+                y = vektor.getY() * norm_fac
+                vektor_norm = Vec3(x, y, 0)
+
+                self.rabbit.setPos(self.rabbit.getPos() + vektor_norm)
 
     def move(self):
         vector_pos = self.rabbit.getPos()
