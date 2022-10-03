@@ -1,15 +1,18 @@
 import math
 from direct.actor.Actor import Actor
-from panda3d.core import Vec3, Vec2
+from panda3d.core import Vec3
 import random as rand
 
 
+# Grundklasse für alle Objekte die gespawnt werden
 class Object():
     def __init__(self, pos, model):
         self.actor = Actor(model, {})
+        # Rendern wird als Fehler angezeigt, ist aber keiner
         self.actor.reparentTo(render)
         self.actor.setPos(pos)
 
+    # Alle Referenzen werden gelöscht und die Nodes (Panda3D hat ein Nodesystem) werden ebenfalls gelöscht
     def delete(self):
         if self.actor is not None:
             self.actor.cleanup()
@@ -47,6 +50,7 @@ class Rabbit(Object):
         distance_min = 10000
         index = -1
 
+        # Pathfinding Algorithmus sucht das nächste Grass-Objekt (Die ganze Mathematik ist selbst geschrieben)
         for i in range(len(food_sources)):
             pos_rabbit = self.actor.getPos()
             pos_grass = food_sources[i].return_pos()
@@ -79,6 +83,7 @@ class Rabbit(Object):
                 pos_rabbit = self.actor.getPos()
                 pos_grass = food_sources[index].return_pos()
 
+                # Der Vektor muss auf die Geschwindigkeit des Hasen normiert werden
                 vektor = pos_grass - pos_rabbit
                 norm_fac = self.speed / distance_min
 
@@ -91,6 +96,7 @@ class Rabbit(Object):
     def move(self):
         vector_pos = self.actor.getPos()
 
+        # Logik damit nicht alle Updates die Richtung aktualisiert wird
         if self.has_moved == 0:
             self.random_direction(self.direction_next_direction)
             self.has_moved = rand.randint(20, 50)
@@ -100,6 +106,7 @@ class Rabbit(Object):
         vector_pos_destiny = vector_pos + self.direction
         return self.check_if_map_border(vector_pos_destiny, vector_pos)
 
+    # Logik damit der Hase nicht aus dem Feld rausläuft
     def check_if_map_border(self, vector, vector_pos):
         if vector.getX() >= 95:
             self.random_direction((1, 2, 3))
@@ -120,6 +127,7 @@ class Rabbit(Object):
 
         return vector
 
+    # Gibt eine Direction ausgehend von der jetzigen zurück (keine 180 Grad Drehungen)
     def random_direction(self, choice):
         number = rand.choice(choice)
         match number:

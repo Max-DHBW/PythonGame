@@ -1,4 +1,4 @@
-from panda3d.core import PointLight, AmbientLight
+from panda3d.core import PointLight
 
 def setup_point_light(render, pos):
     plight = PointLight("point_light")

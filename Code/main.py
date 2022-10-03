@@ -1,10 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import WindowProperties
 from light_setup import setup_point_light
-import random as rand
-from direct.task import Task
-from panda3d.core import Vec3, Vec2
-from GameObjects import *
 
 from GameObjects import *
 
@@ -32,9 +28,6 @@ class Game(ShowBase):
         # Licht
         setup_point_light(self.render, (30, 0, 100))
 
-        # Koordinaten Eckpunkte (Test)
-        print(self.floor.getTightBounds())
-
         # Update Loop Registrierung
         self.updateTask = self.taskMgr.add(self.update, "update")
 
@@ -60,11 +53,13 @@ class Game(ShowBase):
                 grass.delete()
                 self.grasses.remove(grass)
 
+                # Begrenzung damit nicht zu viel Grass auf der Fläche ist (zu viel Grass => viele Hasen => Lag)
                 if len(self.grasses) < 15:
                     self.grasses.append(Grass(Vec3(rand.randint(-90, 90), rand.randint(-90, 90), 0)))
 
         return task.cont
 
+    # Spawnt alle Hasen- und Grass-Objekte
     def spawn_objects(self, count_rabbits, count_grass):
         while count_rabbits != 0:
             speed = rand.choice((0.1, 0.15, 0.05))
@@ -76,5 +71,6 @@ class Game(ShowBase):
             count_grass = count_grass - 1
 
 
+# Startet das Programm
 game = Game()
 game.run()
