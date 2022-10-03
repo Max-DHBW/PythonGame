@@ -3,40 +3,44 @@ from direct.actor.Actor import Actor
 from panda3d.core import Vec3, Vec2
 import random as rand
 
-class Grass():
+
+class Object():
+    def __init__(self, pos, model):
+        self.actor = Actor(model, {})
+        self.actor.reparentTo(render)
+        self.actor.setPos(pos)
+
+    def delete(self):
+        if self.actor is not None:
+            self.actor.cleanup()
+            self.actor.removeNode()
+            self.actor = None
+
+
+class Grass(Object):
     def __init__(self, pos):
-        self.grass = Actor("../Models/grass", {})
-        self.grass.reparentTo(render)
-        self.grass.setPos(pos)
+        Object.__init__(self, pos, "../Models/grass")
 
         self.was_eaten = False
 
     def return_pos(self):
-        return self.grass.getPos()
+        return self.actor.getPos()
 
-    def delete(self):
-        if self.grass is not None:
-            self.grass.cleanup()
-            self.grass.removeNode()
-            self.grass = None
 
-class Rabbit():
+class Rabbit(Object):
     def __init__(self, pos, speed, health):
-        self.rabbit = Actor("../Models/rabbit", {})
-        self.rabbit.reparentTo(render)
-        self.rabbit.setPos(pos)
+        Object.__init__(self, pos, "../Models/rabbit")
 
         self.speed = speed
         self.health = health
         self.max_health = health
         self.visibility_range = 50
 
-        # Initialisirung
+        # Initialisierung
         self.direction = Vec3(0, 0, 0)
         self.direction_next_direction = (0, 1, 2, 3)
         self.has_moved = rand.randint(20, 50)
         self.random_direction(self.direction_next_direction)
-
 
     def update(self, food_sources):
 
@@ -44,10 +48,10 @@ class Rabbit():
         index = -1
 
         for i in range(len(food_sources)):
-            pos_rabbit = self.rabbit.getPos()
+            pos_rabbit = self.actor.getPos()
             pos_grass = food_sources[i].return_pos()
             connection_vektor = pos_grass - pos_rabbit
-            distance = math.sqrt(connection_vektor.getX()**2 + connection_vektor.getY()**2)
+            distance = math.sqrt(connection_vektor.getX() ** 2 + connection_vektor.getY() ** 2)
 
             if distance < distance_min:
                 if not food_sources[i].was_eaten:
@@ -56,7 +60,7 @@ class Rabbit():
 
         # Rabbit sieht kein Grass wegen der Sichtweite
         if distance_min > 20 or index < 0:
-            self.rabbit.setPos(self.move())
+            self.actor.setPos(self.move())
             self.health = self.health - 1
             return
 
@@ -69,10 +73,10 @@ class Rabbit():
             self.health = self.health - 1
             # Distanz ist kleiner als der Schritt, führt dazu, dass Rabbit auf die Position vom Grass geht
             if distance_min <= self.speed:
-                self.rabbit.setPos(food_sources[index].return_pos())
+                self.actor.setPos(food_sources[index].return_pos())
             # Rabbit läuft in die Richtung des Grasses
             else:
-                pos_rabbit = self.rabbit.getPos()
+                pos_rabbit = self.actor.getPos()
                 pos_grass = food_sources[index].return_pos()
 
                 vektor = pos_grass - pos_rabbit
@@ -82,10 +86,10 @@ class Rabbit():
                 y = vektor.getY() * norm_fac
                 vektor_norm = Vec3(x, y, 0)
 
-                self.rabbit.setPos(self.rabbit.getPos() + vektor_norm)
+                self.actor.setPos(self.actor.getPos() + vektor_norm)
 
     def move(self):
-        vector_pos = self.rabbit.getPos()
+        vector_pos = self.actor.getPos()
 
         if self.has_moved == 0:
             self.random_direction(self.direction_next_direction)
@@ -122,22 +126,16 @@ class Rabbit():
             case 0:
                 self.direction = Vec3(self.speed, 0, 0)
                 self.direction_next_direction = (0, 2, 3)
-                self.rabbit.setH(0)
+                self.actor.setH(0)
             case 1:
                 self.direction = Vec3(-self.speed, 0, 0)
                 self.direction_next_direction = (1, 2, 3)
-                self.rabbit.setH(180)
+                self.actor.setH(180)
             case 2:
                 self.direction = Vec3(0, -self.speed, 0)
                 self.direction_next_direction = (2, 0, 1)
-                self.rabbit.setH(-90)
+                self.actor.setH(-90)
             case 3:
                 self.direction = Vec3(0, self.speed, 0)
                 self.direction_next_direction = (3, 0, 1)
-                self.rabbit.setH(90)
-
-    def delete(self):
-        if self.rabbit is not None:
-            self.rabbit.cleanup()
-            self.rabbit.removeNode()
-            self.rabbit = None
+                self.actor.setH(90)

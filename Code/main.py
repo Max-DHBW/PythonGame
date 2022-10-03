@@ -8,6 +8,7 @@ from GameObjects import *
 
 from GameObjects import *
 
+
 class Game(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
@@ -31,7 +32,7 @@ class Game(ShowBase):
         # Licht
         setup_point_light(self.render, (30, 0, 100))
 
-        #Koordinaten Eckpunkte (Test)
+        # Koordinaten Eckpunkte (Test)
         print(self.floor.getTightBounds())
 
         # Update Loop Registrierung
@@ -41,7 +42,7 @@ class Game(ShowBase):
         self.rabbits = []
         self.grasses = []
         # Anzahl der Rabbits und Grasses
-        self.spawn_objects(30, 20)
+        self.spawn_objects(40, 25)
 
     def update(self, task):
         for rabbit in self.rabbits:
@@ -53,22 +54,27 @@ class Game(ShowBase):
         for grass in self.grasses:
             if grass.was_eaten:
                 # Wenn etwas gegessen wurde, wird ein neuer Rabbit erzeugt
-                self.rabbits.append(Rabbit(grass.return_pos(), 0.1, rand.randint(200, 1500)))
+                speed = rand.choice((0.1, 0.15, 0.05))
+                self.rabbits.append(Rabbit(grass.return_pos(), speed, rand.randint(200, 1000)))
 
                 grass.delete()
-                self.grasses.append(Grass(Vec3(rand.randint(-90, 90), rand.randint(-90, 90), 0)))
                 self.grasses.remove(grass)
+
+                if len(self.grasses) < 15:
+                    self.grasses.append(Grass(Vec3(rand.randint(-90, 90), rand.randint(-90, 90), 0)))
 
         return task.cont
 
     def spawn_objects(self, count_rabbits, count_grass):
         while count_rabbits != 0:
-            self.rabbits.append(Rabbit(Vec3(0, 0, 0), 0.1, rand.randint(200, 1500)))
+            speed = rand.choice((0.1, 0.15, 0.05))
+            self.rabbits.append(Rabbit(Vec3(0, 0, 0), speed, rand.randint(200, 1000)))
             count_rabbits = count_rabbits - 1
 
         while count_grass != 0:
             self.grasses.append(Grass(Vec3(rand.randint(-90, 90), rand.randint(-90, 90), 0)))
             count_grass = count_grass - 1
+
 
 game = Game()
 game.run()
