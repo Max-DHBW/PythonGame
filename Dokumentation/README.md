@@ -10,7 +10,7 @@ Zum Ausführen:
 	3. Simulation genießen
 	4. Wenn keine Hasen mehr da sind oder man keine Lust mehr hat, kann das Programm geschlossen werden
 	
-Parameter zum Experementieren (keine Garantie das es noch flüssig läuft oder absürtzt)
+Parameter zum Experementieren (keine Garantie das es noch flüssig läuft oder nicht absürtzt)
 	Anzahl der Hasen und Gräser: main.py Zeile 38
 	speed Parameter für Hasen ändern: main.py Zeile 50 und Zeile 65
 	Sichtweite Hasen: GameObjects.py Zeile 40
